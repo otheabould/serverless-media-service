@@ -31,7 +31,7 @@ describe("factory", () => {
   describe("newUploadUrlRepsonse", () => {
     it("should set the correct fields", () => {
       const actual = newUploadUrlRepsonse("a url");
-      expect(actual.url).toBe("some url");
+      expect(actual.uploadUrl).toBe("a url");
     });
   });
 });
