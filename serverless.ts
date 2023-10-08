@@ -23,6 +23,12 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
+
+      // vars for tests
+      httpApiGatewayEndpointId: { Ref: "HttpApi" },
+      stage: "${self:provider.stage}",
+      region: "${self:provider.region}",
+      service: "${self:service}",
     },
   },
   // import the function via paths
