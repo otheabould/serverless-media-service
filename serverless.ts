@@ -1,3 +1,4 @@
+import requestUploadUrl from "@handlers/requestUploadUrl";
 import type { AWS } from "@serverless/typescript";
 
 const serverlessConfiguration: AWS = {
@@ -23,6 +24,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
+      BUCKET_NAME: "${param:bucketName}",
 
       // vars for tests
       httpApiGatewayEndpointId: { Ref: "HttpApi" },
@@ -32,9 +34,13 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: {},
+  functions: { requestUploadUrl },
 
-  params: {},
+  params: {
+    default: {
+      bucketName: "${self:service}-${self:provider.stage}",
+    },
+  },
 
   custom: {
     esbuild: {
@@ -69,7 +75,29 @@ const serverlessConfiguration: AWS = {
   },
 
   resources: {
-    Resources: {},
+    Resources: {
+      MediaBucket: {
+        Type: "AWS::S3::Bucket",
+        Properties: {
+          BucketName: "${param:bucketName}",
+          PublicAccessBlockConfiguration: {
+            BlockPublicAcls: false,
+          },
+          OwnershipControls: {
+            Rules: [{ ObjectOwnership: "ObjectWriter" }],
+          },
+          CorsConfiguration: {
+            CorsRules: [
+              {
+                AllowedOrigins: ["*"],
+                AllowedHeaders: ["*"],
+                AllowedMethods: ["GET", "PUT", "POST", "HEAD"],
+              },
+            ],
+          },
+        },
+      },
+    },
   },
 };
 
